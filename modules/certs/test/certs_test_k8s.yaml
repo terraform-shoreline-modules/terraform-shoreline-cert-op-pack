@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: certs-test
+  labels:
+    app: certs-test
+spec:
+  restartPolicy: Always
+  containers:
+  - name: certs-test
+    image: debian:11-slim
+    ports:
+      - name: web
+        containerPort: 443
+        protocol: TCP
+    command: [ "bin/sh", "-c", "sleep infinity" ]
+    lifecycle:
+      postStart:
+        exec:
+         command: [ "/bin/bash", "-c", "apt-get update -y && apt install -y python3 procps" ]
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: certs-demo
+spec:
+  selector:
+    app: certs-test
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 443
